@@ -8,7 +8,6 @@ const Users = () => {
   const { users, setUsersList, deleteUserFromList } = useUsers();
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("name");
   const [isLoading, setIsLoading] = useState(false);
   const [localUsers, setLocalUsers] = useState([]);
   const navigate = useNavigate();
@@ -41,7 +40,7 @@ const Users = () => {
     };
   }, [page]); // Remove setUsersList from dependencies
 
-  // Memoize filtered and sorted users
+  // Memoize filtered users
   const filteredUsers = useMemo(() => {
     let filtered = [...localUsers];
     
@@ -55,16 +54,8 @@ const Users = () => {
       );
     }
 
-    // Apply sorting
-    return filtered.sort((a, b) => {
-      if (sortBy === "name") {
-        return (a.first_name + " " + a.last_name).localeCompare(b.first_name + " " + b.last_name);
-      } else if (sortBy === "email") {
-        return a.email.localeCompare(b.email);
-      }
-      return 0;
-    });
-  }, [localUsers, searchTerm, sortBy]);
+    return filtered;
+  }, [localUsers, searchTerm]);
 
   const handleDelete = useCallback(async (id) => {
     try {
@@ -78,10 +69,6 @@ const Users = () => {
 
   const handleSearch = useCallback((e) => {
     setSearchTerm(e.target.value);
-  }, []);
-
-  const handleSort = useCallback((e) => {
-    setSortBy(e.target.value);
   }, []);
 
   return (
@@ -100,7 +87,7 @@ const Users = () => {
           </button>
           <button 
             className="px-4 py-2 rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={() => setPage(prev => prev + 1)}
+            onClick={() => setPage(2)}
             disabled={isLoading}
           >
             Next
@@ -108,27 +95,15 @@ const Users = () => {
         </div>
       </div>
 
-      {/* Search and Filter Section */}
-      <div className="mb-6 flex flex-col sm:flex-row gap-4">
-        <div className="flex-1">
-          <input
-            type="text"
-            placeholder="Search users..."
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            value={searchTerm}
-            onChange={handleSearch}
-          />
-        </div>
-        <div className="flex gap-2">
-          <select
-            className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            value={sortBy}
-            onChange={handleSort}
-          >
-            <option value="name">Sort by Name</option>
-            <option value="email">Sort by Email</option>
-          </select>
-        </div>
+      {/* Search Section */}
+      <div className="mb-6">
+        <input
+          type="text"
+          placeholder="Search users..."
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          value={searchTerm}
+          onChange={handleSearch}
+        />
       </div>
       
       {isLoading ? (
